@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 teste 123 - TESTE MAIN
+=======
+teste 123 - teste do dev_b
+>>>>>>> dev_b
