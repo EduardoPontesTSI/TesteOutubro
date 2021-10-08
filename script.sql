@@ -7,7 +7,7 @@ IF EXISTS (SELECT * FROM SYS.OBJECTS WHERE UPPER(OBJECT_ID) = OBJECT_ID('TELESSV
 GO
 
 CREATE TRIGGER TELESSVR.CONTROLE_BIOMETRIA_REP ON TELESSVR.CONTROLE FOR UPDATE
-AS
+ASS
 
 BEGIN
 --VERSION_CONTROL 1.0.4.0 VERSION_CONTROL
@@ -17191,13 +17191,13 @@ IF EXISTS (SELECT * FROM SYS.OBJECTS WHERE UPPER(OBJECT_ID) = OBJECT_ID('TELESSV
   DROP PROCEDURE TELESSVR.sqlcon_viva
 GO
 
-CREATE PROCEDURE TELESSVR.sqlcon_viva AS
+CREATE PROCEDURE TELESSVR. AS
 
 DECLARE
   @cAux CHAR(1)
 
 BEGIN
-	SET @cAux = 1
+	SET @cAux = 90
 END
 GO
 
@@ -17262,7 +17262,7 @@ GO
 CREATE PROCEDURE TELESSVR.trata3_palmv AS
 
 DECLARE @ret CHAR(1)
-DECLARE @z_endip CHAR(15)
+DECLARE @z_endip CHAR(20)
 DECLARE @z_status CHAR(1)
 DECLARE @z_mat CHAR(12)
 DECLARE @aux_icard CHAR(12)
@@ -17279,7 +17279,7 @@ SET DATEFORMAT YMD
 		(SELECT distinct ICARD from PALMV014 
 			WHERE STATUS = '4'
 		)
-	OPEN cur_troubleIns1
+	OPEN cur_troubleIns2
 	FETCH NEXT FROM cur_troubleIns1 INTO @z_mat
 	WHILE (@@fetch_status != -1) BEGIN
 		DECLARE cur_troubleIns2 CURSOR FOR 
@@ -29465,31 +29465,6 @@ SET DATEFORMAT YMD
 									UPDATE RDIG004 SET STATUS = '4' 
 										WHERE IFUNC = @c_ifunc AND BIO_TIPO = @xc_biotipo and END_IP = @xc_endip
 
-								ELSE IF (@cAux = '2') BEGIN				 -- STATUS = '2' : PODE ESTAR NA SITUAÇÃO DEXECUTANDO E NAO OBTEVE RESPOSTA
-									-- PROCURA EM RDIG002 SE O EQUIPAMENTO ESTÁ MAIS DE 30 SEGUNDOS ESPERANDO RESPOSTA, ENTAO PODE TIRAR.
-									SET @cAux1 = null
-									SET @cAux1 = (SELECT STATUS from RDIG002 
-											where END_IP = @xc_endip and 
-												  STATUS = '2' and 
-												  (DATEADD (SECOND, 30, DATA_LOAD) < getdate()) AND	
-												  ((BIO_TIPO != '6') and (BIO_TIPO != '7') and (BIO_TIPO != '8') and (BIO_TIPO != 'A'))) 		-- O COMANDO FOI FEITO HA MAIS DE 30 SEGUNDOS
-									IF (@cAux != null)	
-										UPDATE RDIG004 SET STATUS = '4' 
-											WHERE IFUNC = @c_ifunc AND BIO_TIPO = @xc_biotipo and END_IP = @xc_endip
-								END
-							END
-						END
-						-- FIM NOVO    FIM NOVO    FIM NOVO    FIM NOVO    FIM NOVO    
-						-- **********************************************************************
-							
-						FETCH next from Rtmp_digeqptos into @xc_endip, @xc_biotipo 
-					END 			
-					
-					CLOSE Rtmp_digeqptos
-					DEALLOCATE Rtmp_digeqptos
-			
-					INSERT INTO TMP_NREPDIGATV (IFUNC, GRUPO, BIO_TIPO) VALUES (@c_ifunc, @c_grupo, @c_biotipo)
-				END
 			END
 			
 			-- atualiza estado para tratado em REPNDIGAUTO000, SE NÃO encontrou equipamento pertencente ao grupo e cai fora para tratar proximo funcionario
